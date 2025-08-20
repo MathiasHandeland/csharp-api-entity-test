@@ -26,6 +26,13 @@ namespace workshop.wwwapi.Repository
             return await _table.FindAsync(id);
         }
 
+        public async Task<T> Add(T entity)
+        {
+            await _table.AddAsync(entity);
+            await _db.SaveChangesAsync();
+            return entity;
+        }
+
         public async Task<IEnumerable<T>> GetWithIncludes(params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _table;

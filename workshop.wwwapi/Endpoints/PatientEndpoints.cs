@@ -14,12 +14,13 @@ namespace workshop.wwwapi.Endpoints
 
             patients.MapGet("/", GetPatients);
             patients.MapGet("/{id}", GetPatientById);
+            patients.MapPost("/", AddPatient);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public static async Task<IResult> GetPatients(IRepository<Patient> patientRepository)
-        { 
+        {
             var patients = await patientRepository.GetAll();
             if (patients == null || !patients.Any()) { return TypedResults.NotFound("No patients found."); }
 
@@ -27,6 +28,8 @@ namespace workshop.wwwapi.Endpoints
             return TypedResults.Ok(patientDto);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public static async Task<IResult> GetPatientById(int id, IRepository<Patient> patientRepository)
         {
             var patients = await patientRepository.GetAll();
@@ -36,10 +39,20 @@ namespace workshop.wwwapi.Endpoints
             return TypedResults.Ok(patientDto);
         }
 
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public static async Task<IResult> AddPatient([FromBody] PatientPostDto patientPostDto, IRepository<Patient> patientRepository, HttpRequest request)
+        {
+            if (patientPostDto == null || string.IsNullOrWhiteSpace(patientPostDto.FullName)) { return TypedResults.BadRequest("Invalid patient data."); }
+            var newPatient = new Patient { FullName = patientPostDto.FullName };
+            var addedPatient = await patientRepository.Add(newPatient);
 
+            var patientDto = new PatientDto { Id = addedPatient.Id, FullName = addedPatient.FullName };
 
+            var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+            var location = $"{baseUrl}/patients/{addedPatient.Id}";
+            return TypedResults.Created(location, patientDto);
 
-
-
+        }
     }
 }

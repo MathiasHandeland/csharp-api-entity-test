@@ -7,7 +7,9 @@ namespace workshop.wwwapi.Repository
     {
         Task<IEnumerable<T>> GetAll();
         Task<T> GetById(int id);
-        
+
+        Task<T> Add(T entity);
+
         Task<IEnumerable<T>> GetWithIncludes(params Expression<Func<T, object>>[] includes);
 
     }
