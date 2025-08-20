@@ -26,6 +26,12 @@ namespace workshop.wwwapi.Data
                 new Patient { Id = 2, FullName = "Cristiano Ronaldo" }
             );
 
+            // Hardcoded two doctors in the database
+            modelBuilder.Entity<Doctor>().HasData(
+                new Doctor { Id = 1, Name = "Dr. Arsene Wenger" },
+                new Doctor { Id = 2, Name = "Dr. Alex Ferguson" }
+            );
+
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
