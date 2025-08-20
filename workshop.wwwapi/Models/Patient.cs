@@ -9,10 +9,10 @@ namespace workshop.wwwapi.Models
     public class Patient
     {
         [Key]
-        [Column("id")]
+        [Column("patient_id")]
         public int Id { get; set; }
 
-        [Column("name")]
+        [Column("patient_name")]
         public string FullName { get; set; }
     }
 }
