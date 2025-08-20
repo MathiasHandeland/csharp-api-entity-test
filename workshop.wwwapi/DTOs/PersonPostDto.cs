@@ -1,6 +1,6 @@
 ﻿namespace workshop.wwwapi.DTOs
 {
-    public class PatientPostDto
+    public class PersonPostDto
     {
         public string FullName { get; set; } = string.Empty;
        

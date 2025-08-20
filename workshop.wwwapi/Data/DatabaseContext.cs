@@ -28,8 +28,8 @@ namespace workshop.wwwapi.Data
 
             // Seed two doctors in the database
             modelBuilder.Entity<Doctor>().HasData(
-                new Doctor { Id = 1, Name = "Dr. Arsene Wenger" },
-                new Doctor { Id = 2, Name = "Dr. Alex Ferguson" }
+                new Doctor { Id = 1, FullName = "Dr. Arsene Wenger" },
+                new Doctor { Id = 2, FullName = "Dr. Alex Ferguson" }
             );
 
             // Seed 4 appointments in the database

@@ -24,7 +24,7 @@ namespace workshop.wwwapi.Endpoints
             var patients = await patientRepository.GetAll();
             if (patients == null || !patients.Any()) { return TypedResults.NotFound("No patients found."); }
 
-            var patientDto = patients.Select(p => new PatientDto { FullName = p.FullName, Id = p.Id }).ToList();
+            var patientDto = patients.Select(p => new PersonDto { FullName = p.FullName, Id = p.Id }).ToList();
             return TypedResults.Ok(patientDto);
         }
 
@@ -35,19 +35,19 @@ namespace workshop.wwwapi.Endpoints
             var patients = await patientRepository.GetAll();
             var patient = patients.FirstOrDefault(p => p.Id == id);
             if (patient == null) { return TypedResults.NotFound($"Patient with ID {id} not found."); }
-            var patientDto = new PatientDto { FullName = patient.FullName, Id = patient.Id };
+            var patientDto = new PersonDto { FullName = patient.FullName, Id = patient.Id };
             return TypedResults.Ok(patientDto);
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public static async Task<IResult> AddPatient([FromBody] PatientPostDto patientPostDto, IRepository<Patient> patientRepository, HttpRequest request)
+        public static async Task<IResult> AddPatient([FromBody] PersonPostDto patientPostDto, IRepository<Patient> patientRepository, HttpRequest request)
         {
             if (patientPostDto == null || string.IsNullOrWhiteSpace(patientPostDto.FullName)) { return TypedResults.BadRequest("Invalid patient data."); }
             var newPatient = new Patient { FullName = patientPostDto.FullName };
             var addedPatient = await patientRepository.Add(newPatient);
 
-            var patientDto = new PatientDto { Id = addedPatient.Id, FullName = addedPatient.FullName };
+            var patientDto = new PersonDto { Id = addedPatient.Id, FullName = addedPatient.FullName };
 
             var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
             var location = $"{baseUrl}/patients/{addedPatient.Id}";
