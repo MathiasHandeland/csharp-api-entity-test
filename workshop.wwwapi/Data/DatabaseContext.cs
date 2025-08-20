@@ -12,7 +12,7 @@ namespace workshop.wwwapi.Data
         {
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build(); // read the connection string from appsettings.json
             _connectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnectionString")!; // store the connection string in a private field
-            this.Database.EnsureCreated(); // ensure the database is created
+            //this.Database.EnsureCreated(); // ensure the database is created
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
