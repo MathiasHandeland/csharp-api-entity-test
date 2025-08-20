@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DatabaseContext>();
 builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
 builder.Services.AddScoped<IRepository<Doctor>, Repository<Doctor>>();
+builder.Services.AddScoped<IRepository<Appointment>, Repository<Appointment>>();
 
 var app = builder.Build();
 
@@ -25,6 +26,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.ConfigurePatientEndpoint();
 app.ConfigureDoctorEndpoint();
+app.ConfigureAppointmentEndpoint();
 app.Run();
 
 public partial class Program { } // needed for testing - please ignore

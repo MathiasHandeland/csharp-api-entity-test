@@ -19,6 +19,5 @@ namespace workshop.wwwapi.Models
         [Column("patient_id")]
         public int PatientId { get; set; }
 
-
     }
 }
