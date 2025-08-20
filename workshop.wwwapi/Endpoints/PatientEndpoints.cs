@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using workshop.wwwapi.DTOs;
+using workshop.wwwapi.Models;
 using workshop.wwwapi.Repository;
 
 namespace workshop.wwwapi.Endpoints
@@ -17,18 +18,18 @@ namespace workshop.wwwapi.Endpoints
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public static async Task<IResult> GetPatients(IRepository repository)
+        public static async Task<IResult> GetPatients(IRepository<Patient> patientRepository)
         { 
-            var patients = await repository.GetPatients();
+            var patients = await patientRepository.GetAll();
             if (patients == null || !patients.Any()) { return TypedResults.NotFound("No patients found."); }
 
             var patientDto = patients.Select(p => new PatientDto { FullName = p.FullName, Id = p.Id }).ToList();
             return TypedResults.Ok(patientDto);
         }
 
-        public static async Task<IResult> GetPatientById(int id, IRepository repository)
+        public static async Task<IResult> GetPatientById(int id, IRepository<Patient> patientRepository)
         {
-            var patients = await repository.GetPatients();
+            var patients = await patientRepository.GetAll();
             var patient = patients.FirstOrDefault(p => p.Id == id);
             if (patient == null) { return TypedResults.NotFound($"Patient with ID {id} not found."); }
             var patientDto = new PatientDto { FullName = patient.FullName, Id = patient.Id };

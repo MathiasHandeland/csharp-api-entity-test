@@ -1,14 +1,14 @@
-﻿using workshop.wwwapi.Models;
+﻿using System.Linq.Expressions;
+using workshop.wwwapi.Models;
 
 namespace workshop.wwwapi.Repository
 {
-    public interface IRepository
+    public interface IRepository<T>
     {
-        Task<IEnumerable<Patient>> GetPatients();
-        Task<Patient> GetPatientById(int id);
-        Task<IEnumerable<Doctor>> GetDoctors();
-        Task<IEnumerable<Appointment>> GetAppointmentsByDoctor(int id);
-
+        Task<IEnumerable<T>> GetAll();
+        Task<T> GetById(int id);
+        
+        Task<IEnumerable<T>> GetWithIncludes(params Expression<Func<T, object>>[] includes);
 
     }
 }

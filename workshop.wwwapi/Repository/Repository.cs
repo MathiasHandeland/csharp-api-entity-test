@@ -1,33 +1,40 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using workshop.wwwapi.Data;
 using workshop.wwwapi.Models;
 
 namespace workshop.wwwapi.Repository
 {
-    public class Repository : IRepository
+    public class Repository<T> : IRepository<T> where T : class
     {
-        private DatabaseContext _databaseContext;
+        private DatabaseContext _db;
+        private DbSet<T> _table = null!;
+
         public Repository(DatabaseContext db)
         {
-            _databaseContext = db;
-        }
-        public async Task<IEnumerable<Patient>> GetPatients()
-        {
-            return await _databaseContext.Patients.ToListAsync();
-        }
-        public async Task<IEnumerable<Doctor>> GetDoctors()
-        {
-            return await _databaseContext.Doctors.ToListAsync();
-        }
-        public async Task<IEnumerable<Appointment>> GetAppointmentsByDoctor(int id)
-        {
-            return await _databaseContext.Appointments.Where(a => a.DoctorId==id).ToListAsync();
+            _db = db;
+            _table = db.Set<T>();
         }
 
-        public async Task<Patient> GetPatientById(int id)
+        public async Task<IEnumerable<T>> GetAll()
         {
-            return await _databaseContext.Patients
-                .FirstOrDefaultAsync(p => p.Id == id);
+            return await _table.ToListAsync();
         }
+
+        public async Task<T> GetById(int id)
+        {
+            return await _table.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<T>> GetWithIncludes(params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _table;
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return await query.ToListAsync();
+        }
+
     }
 }
