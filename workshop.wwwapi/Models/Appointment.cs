@@ -9,7 +9,7 @@ namespace workshop.wwwapi.Models
     {
 
         [Column("booking_date")]
-        public DateTime Booking { get; set; }
+        public DateTime Booking { get; set; } = DateTime.UtcNow;
 
         [ForeignKey("Doctor")]
         [Column("doctor_id")]

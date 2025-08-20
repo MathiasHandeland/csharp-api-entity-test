@@ -26,12 +26,19 @@ namespace workshop.wwwapi.Data
                 new Patient { Id = 2, FullName = "Cristiano Ronaldo" }
             );
 
-            // Hardcoded two doctors in the database
+            // Seed two doctors in the database
             modelBuilder.Entity<Doctor>().HasData(
                 new Doctor { Id = 1, Name = "Dr. Arsene Wenger" },
                 new Doctor { Id = 2, Name = "Dr. Alex Ferguson" }
             );
 
+            // Seed 4 appointments in the database
+            modelBuilder.Entity<Appointment>().HasData(
+                new Appointment { PatientId = 1, DoctorId = 1, Booking = DateTime.UtcNow.AddDays(1) },
+                new Appointment { PatientId = 1, DoctorId = 2, Booking = DateTime.UtcNow.AddDays(2) },
+                new Appointment { PatientId = 2, DoctorId = 1, Booking = DateTime.UtcNow.AddDays(3) },
+                new Appointment { PatientId = 2, DoctorId = 2, Booking = DateTime.UtcNow.AddDays(4) }
+            );
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
