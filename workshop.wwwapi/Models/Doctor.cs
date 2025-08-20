@@ -12,6 +12,9 @@ namespace workshop.wwwapi.Models
         public int Id { get; set; }
 
         [Column("doctor_name")]
-        public string FullName { get; set; }
+        public string Name { get; set; }
+
+        // include a collection of appointments
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }

@@ -17,9 +17,10 @@ namespace workshop.wwwapi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //TODO: Appointment Key etc.. Add Here
-            
+            modelBuilder.Entity<Appointment>()
+                .HasKey(a => new { a.PatientId, a.DoctorId }); // composite key for Appointment
 
-            //TODO: Seed Data Here
+            //TODO: Seed Data Here - i have hardcoded two patients in the database
             modelBuilder.Entity<Patient>().HasData(
                 new Patient { Id = 1, FullName = "Lionel Messi" },
                 new Patient { Id = 2, FullName = "Cristiano Ronaldo" }
