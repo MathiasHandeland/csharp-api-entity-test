@@ -12,7 +12,7 @@ namespace workshop.wwwapi.Endpoints
             var patients = app.MapGroup("patients");
 
             patients.MapGet("/", GetPatients);
-            //patients.MapGet("/doctors{id}", GetDoctors);
+            patients.MapGet("/{id}", GetPatientById);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -26,11 +26,19 @@ namespace workshop.wwwapi.Endpoints
             return TypedResults.Ok(patientDto);
         }
 
+        public static async Task<IResult> GetPatientById(int id, IRepository repository)
+        {
+            var patients = await repository.GetPatients();
+            var patient = patients.FirstOrDefault(p => p.Id == id);
+            if (patient == null) { return TypedResults.NotFound($"Patient with ID {id} not found."); }
+            var patientDto = new PatientDto { FullName = patient.FullName, Id = patient.Id };
+            return TypedResults.Ok(patientDto);
+        }
 
 
 
 
 
-      
+
     }
 }

@@ -18,11 +18,5 @@ namespace workshop.wwwapi.Models
         public int PatientId { get; set; }
 
 
-        [ForeignKey("DoctorId")] // Foreign key to Doctor table
-        public Doctor Doctor { get; set; } // Navigation property
-
-        [ForeignKey("PatientId")] // Foreign key to Patient table
-        public Patient Patient { get; set; } // Navigation property
-
     }
 }
