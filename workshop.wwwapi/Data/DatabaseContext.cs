@@ -20,6 +20,10 @@ namespace workshop.wwwapi.Data
             
 
             //TODO: Seed Data Here
+            modelBuilder.Entity<Patient>().HasData(
+                new Patient { Id = 1, FullName = "Lionel Messi" },
+                new Patient { Id = 2, FullName = "Cristiano Ronaldo" }
+            );
 
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
