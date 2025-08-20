@@ -18,24 +18,47 @@ namespace workshop.wwwapi.Endpoints
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public static async Task<IResult> GetDoctors(IRepository<Doctor> doctorRepository)
+        public static async Task<IResult> GetDoctors(IRepository<Doctor> doctorRepository, IRepository<Patient> patientRepository)
         {
-            var doctors = await doctorRepository.GetAll();
+            var doctors = await doctorRepository.GetWithIncludes(d => d.Appointments);
             if (doctors == null || !doctors.Any()) { return TypedResults.NotFound("No doctors found."); }
 
-            var patientDto = doctors.Select(d => new PersonDto { FullName = d.FullName, Id = d.Id }).ToList();
-            return TypedResults.Ok(patientDto);
+            var patients = (await patientRepository.GetAll()).ToDictionary(p => p.Id, p => p.FullName);
+            var doctorDtos = doctors.Select(d => new DoctorWithAppointmentsDto
+            {
+                Id = d.Id,
+                FullName = d.FullName,
+                Appointments = d.Appointments.Select(a => new AppointmentWithPatientDto
+                {
+                    PatientId = a.PatientId,
+                    PatientName = patients.TryGetValue(a.PatientId, out var name) ? name : ""
+                }).ToList()
+            }).ToList();
+
+            return TypedResults.Ok(doctorDtos);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public static async Task<IResult> GetDoctorById(int id, IRepository<Doctor> doctorRepository)
+        public static async Task<IResult> GetDoctorById(int id, IRepository<Doctor> doctorRepository, IRepository<Patient> patientRepository)
         {
-            var doctors = await doctorRepository.GetAll();
+            var doctors = await doctorRepository.GetWithIncludes(d => d.Appointments);
             var doctor = doctors.FirstOrDefault(d => d.Id == id);
             if (doctor == null) { return TypedResults.NotFound($"Doctor with ID {id} not found."); }
-            var patientDto = new PersonDto { FullName = doctor.FullName, Id = doctor.Id };
-            return TypedResults.Ok(patientDto);
+
+            var patients = (await patientRepository.GetAll()).ToDictionary(p => p.Id, p => p.FullName);
+            var doctorDto = new DoctorWithAppointmentsDto
+            {
+                Id = doctor.Id,
+                FullName = doctor.FullName,
+                Appointments = doctor.Appointments.Select(a => new AppointmentWithPatientDto
+                {
+                    PatientId = a.PatientId,
+                    PatientName = patients.TryGetValue(a.PatientId, out var name) ? name : ""
+                }).ToList()
+            };
+
+            return TypedResults.Ok(doctorDto);
         }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
