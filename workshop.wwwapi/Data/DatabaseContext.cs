@@ -10,9 +10,9 @@ namespace workshop.wwwapi.Data
         private string _connectionString;
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
-            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-            _connectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnectionString")!;
-            this.Database.EnsureCreated();
+            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build(); // read the connection string from appsettings.json
+            _connectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnectionString")!; // store the connection string in a private field
+            this.Database.EnsureCreated(); // ensure the database is created
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,7 +25,7 @@ namespace workshop.wwwapi.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseInMemoryDatabase(databaseName: "Database");
-            optionsBuilder.UseNpgsql(_connectionString);
+            optionsBuilder.UseNpgsql(_connectionString); // using the connection string to connect to the postegreSQL database
             optionsBuilder.LogTo(message => Debug.WriteLine(message)); //see the sql EF using in the console
             
         }
