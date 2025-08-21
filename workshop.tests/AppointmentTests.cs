@@ -63,20 +63,23 @@ namespace workshop.tests
             // Arrange: prepare request data
             var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder => { });
             var client = factory.CreateClient();
-            
+
+            // create a new appointment object to be sent in the request body
             var newAppointment = new AppointmentPostDto
             {
                 PatientId = 1, // Lionel Messi
                 DoctorId = 2, // Dr. Alex Ferguson
-                Booking = DateTime.UtcNow.AddDays(5) // booking for 5 days later
+                Booking = DateTime.UtcNow.AddDays(10) // booking for 5 days later
             };
 
+            // convert the new appointment object to JSON and create a StringContent object to be sent in the request body
             var contentStream = new StringContent(
                JsonSerializer.Serialize(newAppointment),
                Encoding.UTF8,
                "application/json"
            );
 
+            // Act: Send a POST request to the /appointments endpoint with the new appointment data
             var response = await client.PostAsync("/appointments", contentStream);
 
             // Assert: check the response

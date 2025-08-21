@@ -24,7 +24,8 @@ public class Tests
         // Assert: check the response
         Assert.That(response.StatusCode == System.Net.HttpStatusCode.OK);
 
-        var contentStream = await response.Content.ReadAsStreamAsync(); // read the response content as a stream 
+        // Read the response body and converts the JSON into a list of AppointmentWithDetailsDto objects.
+        var contentStream = await response.Content.ReadAsStreamAsync();
         var patients = await JsonSerializer.DeserializeAsync<List<PatientWithAppointmentsDto>>(
             contentStream,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
@@ -65,7 +66,7 @@ public class Tests
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder => { });
         var client = factory.CreateClient();
         var newPatient = new PersonPostDto { FullName = "Dimitar Berbatov" };
-        var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(newPatient), System.Text.Encoding.UTF8, "application/json");
+        var content = new StringContent(JsonSerializer.Serialize(newPatient), System.Text.Encoding.UTF8, "application/json");
         
         // Act: make an API call using the shared _client instance
         var response = await client.PostAsync("/patients", content);
