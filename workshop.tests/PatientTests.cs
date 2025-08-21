@@ -6,17 +6,19 @@ namespace workshop.tests;
 public class Tests
 {
 
-    [Test]
-    public async Task PatientEndpointStatus()
+    [Test] // Test that endpoint for getting patients returns a list of patients
+    public async Task GetPatients()
     {
-        // Arrange
+        // Arrange: prepare request data
         var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder => { });
         var client = factory.CreateClient();
 
-        // Act
+        // Act: make an API call using the shared _client instance
         var response = await client.GetAsync("/patients");
 
-        // Assert
-        //Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
+        // Assert: check the response
+        Assert.That(response.StatusCode == System.Net.HttpStatusCode.OK);
+
+    
     }
 }
