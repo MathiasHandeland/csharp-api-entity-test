@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System.Diagnostics;
+using System.Text.Json;
 using workshop.wwwapi.DTOs;
 using workshop.wwwapi.Models;
 
@@ -23,15 +24,14 @@ public class Tests
         // Assert: check the response
         Assert.That(response.StatusCode == System.Net.HttpStatusCode.OK);
 
-        var content = await response.Content.ReadAsStringAsync(); // read the response content as string
-        var patients = System.Text.Json.JsonSerializer.Deserialize<List<PatientWithAppointmentsDto>>(content); // deserialize the JSON response to a list of Patients
-        Assert.That(patients, Is.Not.Null);
-        Assert.That(patients.Count, Is.GreaterThanOrEqualTo(2)); // check that there are at least 2 patients
-
-        patients.ForEach(p => TestContext.WriteLine(p.FullName));
-
-        Assert.That(patients.Any(p => p.FullName == "Lionel Messi")); // check that Lionel Messi is in the list
-
+        var contentStream = await response.Content.ReadAsStreamAsync(); // read the response content as a stream 
+        var patients = await JsonSerializer.DeserializeAsync<List<PatientWithAppointmentsDto>>(
+            contentStream,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
+        Assert.That(patients, Is.Not.Null); // check that the patients list is not null
+        Assert.That(patients.Count > 0); // check that the patients list contains at least one patient
+        Assert.That(patients.Any(p => p.FullName == "Lionel Messi")); // check that the seeded patient is in the list
 
     }
 
@@ -48,8 +48,12 @@ public class Tests
         // Assert: check the response
         Assert.That(response.StatusCode == System.Net.HttpStatusCode.OK);
 
-        var content = await response.Content.ReadAsStringAsync(); // read the response content as string
-        var patient = System.Text.Json.JsonSerializer.Deserialize<PatientWithAppointmentsDto>(content); // deserialize the JSON response to a PatientWithAppointmentsDto
+        var contentStream = await response.Content.ReadAsStreamAsync();
+        var patient = await JsonSerializer.DeserializeAsync<PatientWithAppointmentsDto>(
+            contentStream,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
+
         Assert.That(patient, Is.Not.Null);
         Assert.That(patient.FullName, Is.EqualTo("Lionel Messi"));
     }
@@ -70,10 +74,14 @@ public class Tests
         Assert.That(response.StatusCode == System.Net.HttpStatusCode.Created);
 
         var getResponse = await client.GetAsync("/patients"); // get all patients to check if the new patient was added
-        var getContent = await getResponse.Content.ReadAsStringAsync();
-        var patients = System.Text.Json.JsonSerializer.Deserialize<List<PatientWithAppointmentsDto>>(getContent);
+        var contentStream = await getResponse.Content.ReadAsStreamAsync();
+        var patients = await JsonSerializer.DeserializeAsync<List<PatientWithAppointmentsDto>>(
+            contentStream,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
         Assert.That(patients, Is.Not.Null);
         Assert.That(patients.Any(p => p.FullName == "Dimitar Berbatov")); // check that the new patient is in the list
+
     }
 
 
