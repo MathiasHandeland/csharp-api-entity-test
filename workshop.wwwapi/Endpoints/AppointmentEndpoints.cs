@@ -1,4 +1,5 @@
-﻿using workshop.wwwapi.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using workshop.wwwapi.DTOs;
 using workshop.wwwapi.Models;
 using workshop.wwwapi.Repository;
 
@@ -15,6 +16,7 @@ namespace workshop.wwwapi.Endpoints
 
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public static async Task<IResult> GetAppointments(IRepository<Appointment> appointmentRepository, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
         {
             var appointments = await appointmentRepository.GetAll();
@@ -30,9 +32,21 @@ namespace workshop.wwwapi.Endpoints
             return Results.Ok(result);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public static async Task<IResult> GetAppointmentById(int id, IRepository<Appointment> appointmentRepository, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
         {
-            throw new NotImplementedException("This method is not implemented yet. Please implement it according to the requirements in the README.md file.");
+            var appointment = await appointmentRepository.GetById(id);
+            if (appointment == null) { return Results.NotFound($"Appointment with ID {id} not found."); }
+            var patient = await patientRepository.GetById(appointment.PatientId);
+            var doctor = await doctorRepository.GetById(appointment.DoctorId);
+
+            var result = new AppointmentWithDetailsDto
+            {
+                PatientName = patient?.FullName,
+                DoctorName = doctor?.FullName
+            };
+            return Results.Ok(result);
         }
     }
 }

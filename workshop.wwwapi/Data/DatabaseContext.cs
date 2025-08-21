@@ -16,9 +16,8 @@ namespace workshop.wwwapi.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //TODO: Appointment Key etc.. Add Here
-            modelBuilder.Entity<Appointment>()
-                .HasKey(a => new { a.PatientId, a.DoctorId }); // composite key for Appointment
+            //TODO: Appointment Key etc.. Add Here: I added a Id to appointment so it doesnt use the composite key of PatientId and DoctorId any longer
+
 
             //TODO: Seed Data Here - i have hardcoded two patients in the database
             modelBuilder.Entity<Patient>().HasData(
