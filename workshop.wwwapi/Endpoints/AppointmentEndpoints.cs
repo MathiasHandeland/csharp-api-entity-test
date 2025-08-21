@@ -29,7 +29,8 @@ namespace workshop.wwwapi.Endpoints
             var result = appointments.Select(a => new AppointmentWithDetailsDto
             {
                 PatientName = patients.FirstOrDefault(p => p.Id == a.PatientId)?.FullName,
-                DoctorName = doctors.FirstOrDefault(d => d.Id == a.DoctorId)?.FullName
+                DoctorName = doctors.FirstOrDefault(d => d.Id == a.DoctorId)?.FullName,
+                Booking = a.Booking
             });
 
             return Results.Ok(result);
@@ -47,7 +48,8 @@ namespace workshop.wwwapi.Endpoints
             var result = new AppointmentWithDetailsDto
             {
                 PatientName = patient.FullName,
-                DoctorName = doctor.FullName
+                DoctorName = doctor.FullName,
+                Booking = appointment.Booking
             };
 
             return Results.Ok(result);
@@ -66,7 +68,8 @@ namespace workshop.wwwapi.Endpoints
             var result = patientAppointments.Select(a => new AppointmentWithDetailsDto
             {
                 PatientName = patient.FullName,
-                DoctorName = doctors.FirstOrDefault(d => d.Id == a.DoctorId)?.FullName
+                DoctorName = doctors.FirstOrDefault(d => d.Id == a.DoctorId)?.FullName,
+                Booking = a.Booking
             });
 
             return Results.Ok(result);
@@ -86,7 +89,8 @@ namespace workshop.wwwapi.Endpoints
             var result = doctorAppointments.Select(a => new AppointmentWithDetailsDto
             {
                 PatientName = patients.FirstOrDefault(p => p.Id == a.PatientId)?.FullName,
-                DoctorName = doctor.FullName
+                DoctorName = doctor.FullName,
+                Booking = a.Booking
             });
 
             return Results.Ok(result);
@@ -94,10 +98,27 @@ namespace workshop.wwwapi.Endpoints
 
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public static async Task<IResult> AddAppointment(AppointmentPostDto appointmentPostDto, IRepository<Appointment> appointmentRepository, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
+        public static async Task<IResult> AddAppointment(AppointmentPostDto appointmentPostDto, IRepository<Appointment> appointmentRepository, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository, HttpRequest request)
         {
             if (appointmentPostDto == null || appointmentPostDto.PatientId <= 0 || appointmentPostDto.DoctorId <= 0) { return Results.BadRequest("Invalid appointment data."); }
-            
+            var newAppointment = new Appointment
+            {
+                PatientId = appointmentPostDto.PatientId,
+                DoctorId = appointmentPostDto.DoctorId,
+                Booking = appointmentPostDto.Booking
+            };
+            var addedAppointment = await appointmentRepository.Add(newAppointment);
+
+            var appointmentDto = new AppointmentWithDetailsDto
+            {
+                PatientName = (await patientRepository.GetById(addedAppointment.PatientId))?.FullName,
+                DoctorName = (await doctorRepository.GetById(addedAppointment.DoctorId))?.FullName,
+                Booking = addedAppointment.Booking
+            };
+
+            var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+            var location = $"{baseUrl}/patients/{addedAppointment.Id}";
+            return TypedResults.Created(location, appointmentDto);
         }
 
             

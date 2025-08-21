@@ -5,5 +5,7 @@ namespace workshop.wwwapi.DTOs
     {
         public int DoctorId { get; set; }
         public string DoctorName { get; set; } = string.Empty;
+
+        public DateTime Booking { get; set; }
     }
 }

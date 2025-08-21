@@ -33,7 +33,8 @@ namespace workshop.wwwapi.Endpoints
                 Appointments = p.Appointments.Select(a => new AppointmentWithDoctorDto
                 {
                     DoctorId = a.DoctorId,
-                    DoctorName = doctors.TryGetValue(a.DoctorId, out var name) ? name : ""
+                    DoctorName = doctors.TryGetValue(a.DoctorId, out var name) ? name : "",
+                    Booking = a.Booking
                 }).ToList()
             }).ToList();
 
@@ -57,7 +58,8 @@ namespace workshop.wwwapi.Endpoints
                 Appointments = patient.Appointments.Select(a => new AppointmentWithDoctorDto
                 {
                     DoctorId = a.DoctorId,
-                    DoctorName = doctors.TryGetValue(a.DoctorId, out var name) ? name : ""
+                    DoctorName = doctors.TryGetValue(a.DoctorId, out var name) ? name : "",
+                    Booking = a.Booking
                 }).ToList()
             };
 
