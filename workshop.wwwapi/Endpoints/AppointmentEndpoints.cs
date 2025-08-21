@@ -36,17 +36,7 @@ namespace workshop.wwwapi.Endpoints
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public static async Task<IResult> GetAppointmentById(int id, IRepository<Appointment> appointmentRepository, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
         {
-            var appointment = await appointmentRepository.GetById(id);
-            if (appointment == null) { return Results.NotFound($"Appointment with ID {id} not found."); }
-            var patient = await patientRepository.GetById(appointment.PatientId);
-            var doctor = await doctorRepository.GetById(appointment.DoctorId);
-
-            var result = new AppointmentWithDetailsDto
-            {
-                PatientName = patient?.FullName,
-                DoctorName = doctor?.FullName
-            };
-            return Results.Ok(result);
+            throw new NotImplementedException("This method is not implemented yet. Please implement it according to the requirements in the README.md file.");
         }
     }
 }
