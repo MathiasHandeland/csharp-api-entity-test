@@ -13,6 +13,9 @@ namespace workshop.wwwapi.Endpoints
 
             appointments.MapGet("/", GetAppointments);
             appointments.MapGet("/{id}", GetAppointmentById);
+            appointments.MapGet("/patients/{patientId}", GetAppointmentsByPatientId);
+            appointments.MapGet("/doctors/{doctorId}", GetAppointmentByDoctorId);
+            appointments.MapPost("/", AddAppointment);
 
         }
 
@@ -36,7 +39,67 @@ namespace workshop.wwwapi.Endpoints
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public static async Task<IResult> GetAppointmentById(int id, IRepository<Appointment> appointmentRepository, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
         {
-            throw new NotImplementedException("This method is not implemented yet. Please implement it according to the requirements in the README.md file.");
+            var appointment = await appointmentRepository.GetById(id);
+            if (appointment == null) { return Results.NotFound($"Appointment with ID {id} not found."); }
+            var patient = await patientRepository.GetById(appointment.PatientId);
+            var doctor = await doctorRepository.GetById(appointment.DoctorId);
+
+            var result = new AppointmentWithDetailsDto
+            {
+                PatientName = patient.FullName,
+                DoctorName = doctor.FullName
+            };
+
+            return Results.Ok(result);
         }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public static async Task<IResult> GetAppointmentsByPatientId(int patientId, IRepository<Appointment> appointmentRepository, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
+        {
+            var patient = await patientRepository.GetById(patientId);
+            if (patient == null) { return Results.NotFound($"Patient with ID {patientId} not found."); }
+            var appointments = await appointmentRepository.GetAll();
+            var doctors = await doctorRepository.GetAll();
+            var patientAppointments = appointments.Where(a => a.PatientId == patientId);
+            if (!patientAppointments.Any()) { return Results.NotFound($"No appointments found for patient with ID {patientId}."); }
+            var result = patientAppointments.Select(a => new AppointmentWithDetailsDto
+            {
+                PatientName = patient.FullName,
+                DoctorName = doctors.FirstOrDefault(d => d.Id == a.DoctorId)?.FullName
+            });
+
+            return Results.Ok(result);
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public static async Task<IResult> GetAppointmentByDoctorId(int doctorId, IRepository<Appointment> appointmentRepository, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
+        {
+            var doctor = await doctorRepository.GetById(doctorId);
+            if (doctor == null) { return Results.NotFound($"Doctor with ID {doctorId} not found."); }
+            var appointments = await appointmentRepository.GetAll();
+            var patients = await patientRepository.GetAll();
+            var doctorAppointments = appointments.Where(a => a.DoctorId == doctorId);
+            if (!doctorAppointments.Any()) { return Results.NotFound($"No appointments found for doctor with ID {doctorId}."); }
+
+            var result = doctorAppointments.Select(a => new AppointmentWithDetailsDto
+            {
+                PatientName = patients.FirstOrDefault(p => p.Id == a.PatientId)?.FullName,
+                DoctorName = doctor.FullName
+            });
+
+            return Results.Ok(result);
+        }
+
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public static async Task<IResult> AddAppointment(AppointmentPostDto appointmentPostDto, IRepository<Appointment> appointmentRepository, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
+        {
+            if (appointmentPostDto == null || appointmentPostDto.PatientId <= 0 || appointmentPostDto.DoctorId <= 0) { return Results.BadRequest("Invalid appointment data."); }
+            
+        }
+
+            
     }
 }
