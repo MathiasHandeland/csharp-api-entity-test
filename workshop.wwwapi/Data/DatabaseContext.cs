@@ -7,13 +7,7 @@ namespace workshop.wwwapi.Data
 {
     public class DatabaseContext : DbContext
     {
-        private string _connectionString;
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
-        {
-            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build(); // read the connection string from appsettings.json
-            _connectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnectionString")!; // store the connection string in a private field
-            //this.Database.EnsureCreated(); // ensure the database is created
-        }
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -37,14 +31,6 @@ namespace workshop.wwwapi.Data
                 new Appointment { Id = 4, PatientId = 2, DoctorId = 2, Booking = DateTime.UtcNow.AddDays(4) }
             );
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            //optionsBuilder.UseInMemoryDatabase(databaseName: "Database");
-            optionsBuilder.UseNpgsql(_connectionString); // using the connection string to connect to the postegreSQL database
-            optionsBuilder.LogTo(message => Debug.WriteLine(message)); //see the sql EF using in the console
-            
-        }
-
 
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
