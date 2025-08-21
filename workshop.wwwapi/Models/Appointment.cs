@@ -22,5 +22,9 @@ namespace workshop.wwwapi.Models
         [Column("patient_id")]
         public int PatientId { get; set; }
 
+
+        // Navigation properties, used for Entity Framework to establish relationships and the includes in the queries
+        public virtual Doctor Doctor { get; set; } = null!;
+        public virtual Patient Patient { get; set; } = null!;
     }
 }

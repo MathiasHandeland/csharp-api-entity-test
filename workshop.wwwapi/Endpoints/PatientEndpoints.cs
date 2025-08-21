@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using workshop.wwwapi.DTOs;
 using workshop.wwwapi.Models;
 using workshop.wwwapi.Repository;
@@ -21,7 +22,9 @@ namespace workshop.wwwapi.Endpoints
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public static async Task<IResult> GetPatients(IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
         {
-            var patients = await patientRepository.GetWithIncludes(p => p.Appointments);
+            var patients = await patientRepository.GetWithIncludes(q =>
+                q.Include(p => p.Appointments)
+                 .ThenInclude(a => a.Doctor));
             if (patients == null || !patients.Any()) { return TypedResults.NotFound("No patients found."); }
 
             var doctors = (await doctorRepository.GetAll()).ToDictionary(d => d.Id, d => d.FullName);
@@ -45,7 +48,9 @@ namespace workshop.wwwapi.Endpoints
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public static async Task<IResult> GetPatientById(int id, IRepository<Patient> patientRepository, IRepository<Doctor> doctorRepository)
         {
-            var patients = await patientRepository.GetWithIncludes(p => p.Appointments);
+            var patients = await patientRepository.GetWithIncludes(q =>
+                q.Include(p => p.Appointments)
+                 .ThenInclude(a => a.Doctor));
             var patient = patients.FirstOrDefault(p => p.Id == id);
             if (patient == null) { return TypedResults.NotFound($"Patient with ID {id} not found."); }
 

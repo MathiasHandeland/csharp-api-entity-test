@@ -10,7 +10,8 @@ namespace workshop.wwwapi.Repository
 
         Task<T> Add(T entity);
 
-        Task<IEnumerable<T>> GetWithIncludes(params Expression<Func<T, object>>[] includes);
+        //Task<IEnumerable<T>> GetWithIncludes(params Expression<Func<T, object>>[] includes);
+        Task<IEnumerable<T>> GetWithIncludes(Func<IQueryable<T>, IQueryable<T>> includeQuery); // used for dynamic includes
 
     }
 }

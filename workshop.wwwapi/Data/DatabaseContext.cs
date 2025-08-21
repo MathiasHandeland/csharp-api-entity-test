@@ -17,18 +17,6 @@ namespace workshop.wwwapi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            // Patient - Appointment (One-to-Many)
-            modelBuilder.Entity<Patient>()
-                .HasMany(p => p.Appointments)
-                .WithOne()
-                .HasForeignKey(a => a.PatientId);
-
-            // Doctor - Appointment (One-to-Many)
-            modelBuilder.Entity<Doctor>()
-                .HasMany(d => d.Appointments)
-                .WithOne()
-                .HasForeignKey(a => a.DoctorId);
-
             //TODO: Seed Data Here - i have hardcoded two patients in the database
             modelBuilder.Entity<Patient>().HasData(
                 new Patient { Id = 1, FullName = "Lionel Messi" },
