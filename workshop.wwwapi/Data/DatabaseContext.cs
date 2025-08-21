@@ -16,10 +16,18 @@ namespace workshop.wwwapi.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //TODO: Appointment Key etc.. Add Here:
-            modelBuilder.Entity<Appointment>()
-                .HasKey(a => new { a.PatientId, a.DoctorId, a.Booking });
 
+            // Patient - Appointment (One-to-Many)
+            modelBuilder.Entity<Patient>()
+                .HasMany(p => p.Appointments)
+                .WithOne()
+                .HasForeignKey(a => a.PatientId);
+
+            // Doctor - Appointment (One-to-Many)
+            modelBuilder.Entity<Doctor>()
+                .HasMany(d => d.Appointments)
+                .WithOne()
+                .HasForeignKey(a => a.DoctorId);
 
             //TODO: Seed Data Here - i have hardcoded two patients in the database
             modelBuilder.Entity<Patient>().HasData(
@@ -35,10 +43,10 @@ namespace workshop.wwwapi.Data
 
             // Seed 4 appointments in the database
             modelBuilder.Entity<Appointment>().HasData(
-                new Appointment { PatientId = 1, DoctorId = 1, Booking = DateTime.UtcNow.AddDays(1) },
-                new Appointment { PatientId = 1, DoctorId = 2, Booking = DateTime.UtcNow.AddDays(2) },
-                new Appointment { PatientId = 2, DoctorId = 1, Booking = DateTime.UtcNow.AddDays(3) },
-                new Appointment { PatientId = 2, DoctorId = 2, Booking = DateTime.UtcNow.AddDays(4) }
+                new Appointment { Id = 1, PatientId = 1, DoctorId = 1, Booking = DateTime.UtcNow.AddDays(1) },
+                new Appointment { Id = 2, PatientId = 1, DoctorId = 2, Booking = DateTime.UtcNow.AddDays(2) },
+                new Appointment { Id = 3, PatientId = 2, DoctorId = 1, Booking = DateTime.UtcNow.AddDays(3) },
+                new Appointment { Id = 4, PatientId = 2, DoctorId = 2, Booking = DateTime.UtcNow.AddDays(4) }
             );
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

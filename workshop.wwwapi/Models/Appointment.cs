@@ -7,6 +7,9 @@ namespace workshop.wwwapi.Models
     [Table("appointments")]
     public class Appointment
     {
+        [Key]
+        [Column("appointment_id")]
+        public int Id { get; set; }
 
         [Column("booking_date")]
         public DateTime Booking { get; set; } = DateTime.UtcNow;
